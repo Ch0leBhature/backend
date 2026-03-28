@@ -54,11 +54,11 @@ const userSchema = new Schema({
 //hooks -> run this code at a specific moment
 //these take a bit of time so async
 //and passed ref of next as they are a middleware[mongoose docs]
-userSchema.pre("save",async function(next) {
-  if(!this.isModified("password")) return next();
-  this.password=bcrypt.hash(this.password, 10)
-  next();
-})
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  this.password = await bcrypt.hash(this.password, 10);
+});
 
 userSchema.methods.isPasswordCorrect = async function(password){
   return await bcrypt.compare(password,this.password)
