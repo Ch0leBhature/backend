@@ -341,6 +341,39 @@ const updateuserCover = asyncHandler(async(req,res) => {
 
 })
 
+const getChannelProfile = asyncHandler(async(req,res) => {
+  const {username}=req.params;
+
+  if(!username?.trim()){   //? has operator precendence over !
+    throw ApiError(400,"Username Not found")
+  }
+  const channel = await User.aggregate([
+    //aggregate pipelines
+    {
+      $match :{
+        username:username?.toLowerCase()
+      } 
+    },
+    {
+      $lookup:{
+        from:"subcriptions",
+        localField:"_id",
+        foreignField:"channel",
+        as:"subscribers"
+      }
+
+    },
+    {
+      
+      $lookup:{
+        from:"subcriptions",
+        localField:"_id",
+        foreignField:"subscriber",
+        as:"subscribersto"
+      }
+  }])
+})
+
 // const test = asyncHandler(async (req,res) => ) 
 
 export {registerUser, loginUser,logoutUser,refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails,updateuserAvatar,updateuserCover}
